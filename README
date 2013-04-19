@@ -1,1 +1,13 @@
 This application will get recent measurements from your NetAtmo and light up a ThingM blink(1) (http://thingm.com/products/blink-1.html) as an ambient display.
+
+The repo also includes a daemonizer, but you must install forever (https://npmjs.org/package/forever) to use it:
+
+```javascript
+npm install forever
+```
+
+To start the daemon, use:
+
+```javascript
+forever start atmo_daemon.js
+```

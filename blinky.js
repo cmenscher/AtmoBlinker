@@ -267,7 +267,7 @@ var app = {
         var val = this.lastValue;
         if(val < 45) {
             blink1.fadeToRGB(500, 0, 0, 255);
-        } else if( val > 45 || val < 52) {
+        } else if( val > 45 && val < 50) {
             blink1.fadeToRGB(500, 0, 255, 0);
         } else {
             blink1.fadeToRGB(500, 255, 0, 0);
@@ -297,6 +297,7 @@ var app = {
         });
 
         
+        // Initialize the first blink(1) found and cycle through some colors to be funky
         blink1 = new Blink1.Blink1();
         blink1.fadeToRGB(500, 255, 0, 0, function() { blink1.fadeToRGB(500, 0, 255, 0, function() { blink1.fadeToRGB(500, 9, 0, 255, function() { blink1.fadeToRGB(100, 0, 0, 0);});})})
 
