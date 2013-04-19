@@ -239,8 +239,6 @@ var app = {
 
             res.on('data', function(d) {
                 var res = JSON.parse(d);
-                console.log(res.body[0].value[0][0]);
-                console.log("\n");
 
                 var val = res.body[0].value[0][0];
                 if(_this.lastValue != val) {
