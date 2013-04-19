@@ -9,7 +9,7 @@ var querystring = require('querystring');
 
 
 var config = {
-    loop_interval: 8000, // 8sec
+    loop_interval: 10000, // 10 sec
 
     auth_request: {
         grant_type: "password",
@@ -59,7 +59,7 @@ var app = {
     getToken: function(callback) {
         var _this = this;
 
-        console.log("Getting authorization token...");
+        _this.log("Getting authorization token...");
 
         if(arguments.length === 0) {
             var callback = function() {};
@@ -84,8 +84,9 @@ var app = {
 
             config.nextTokenRefresh = app.startTime + config.credentials.expires_in;
 
-            console.log(config.credentials);
-            console.log("\n");
+            _this.log("Successfully retrieved token...");
+            //console.log(config.credentials);
+            //console.log("\n");
             //process.stdout.write(d);
 
             callback();
@@ -102,7 +103,7 @@ var app = {
 
     refreshToken: function() {
         var _this = this;
-        console.log("Refreshing authorization token...");
+        _this.log("Refreshing authorization token...");
 
         // Set the refresh token based on current credentials
         config.auth_refresh.refresh_token = config.credentials.refresh_token;
@@ -126,8 +127,9 @@ var app = {
 
                 config.nextTokenRefresh = app.startTime + config.credentials.expires_in;
 
-                console.log(config.credentials);
-                console.log("\n");
+                _this.log("Successfully refreshed access token...");
+                //console.log(config.credentials);
+                //console.log("\n");
                 //process.stdout.write(d);
             });
         });
@@ -143,13 +145,13 @@ var app = {
     refreshTokenCheck: function() {
         var _this = this;
 
-        console.log("\nChecking to see if the access token needs to be refreshed...");
+        app.log("Checking to see if the access token needs to be refreshed...");
 
         var now = new Date();
         var now_millis = now.getTime() / 1000;
 
-        // Note: adding 1 minute to the expires_in cutoff so we can prevent loop() from being called when the token has expired
-        if(config.nextTokenRefresh > (app.startTime + config.credentials.expires_in + 60000)) {
+        // Note: adding 2 minutes to the expires_in cutoff so we can prevent loop() from being called when the token has expired
+        if(config.nextTokenRefresh > (app.startTime + config.credentials.expires_in + 120000)) {
             app.startTime = now; // update startTime to now so we can check all over again
             app.refreshToken();
         }
@@ -171,7 +173,6 @@ var app = {
 
                 //DO SOMETHING
 
-                console.log("\n");
                 //process.stdout.write(d);
             });
         });
@@ -190,9 +191,9 @@ var app = {
         config.api_options.path = "/api/devicelist?access_token=" + config.credentials.access_token;
 
         var req = https.request(config.api_options, function(res) {
-            console.log("statusCode: ", res.statusCode);
-            console.log("headers: ", res.headers);
-            console.log("\n");
+            //console.log("statusCode: ", res.statusCode);
+            //console.log("headers: ", res.headers);
+            //console.log("\n");
 
             res.on('data', function(d) {
                 var res = JSON.parse(d);
@@ -200,8 +201,6 @@ var app = {
                 var _id = res.body.devices[0]._id;
 
                 /* DO SOMETHING */
-
-                console.log("\n");
 
                 //process.stdout.write(d);
             });
@@ -233,15 +232,16 @@ var app = {
 
 
         var req = https.request(config.api_options, function(res) {
-            console.log("statusCode: ", res.statusCode);
-            console.log("headers: ", res.headers);
-            console.log("\n");
+            //console.log("statusCode: ", res.statusCode);
+            //console.log("headers: ", res.headers);
+            //console.log("\n");
 
             res.on('data', function(d) {
                 var res = JSON.parse(d);
 
                 var val = res.body[0].value[0][0];
                 if(_this.lastValue != val) {
+                    _this.log("Value has changed! Updating LED...");
                     _this.lastValue = val;
                     _this.setRGB();
                 }
@@ -278,7 +278,8 @@ var app = {
         /* This is the loop that will get the data at the interval specified in the config object */
         var _this = this;
         setInterval(function() {
-            console.log("Running...");
+            //console.log();
+            _this.log("Fetching data from your netatmo...");
             //_this.getUser();
             //_this.getDevices();
             _this.getMeasurement("70:ee:50:00:71:fc");
@@ -292,7 +293,7 @@ var app = {
         this.startTime = now.getTime() / 1000; // Unix epoch
 
         this.getToken(function() {
-            _this.refreshTokenTimer = setInterval(_this.refreshTokenCheck, 10000); // check every 10 sec
+            _this.refreshTokenTimer = setInterval(_this.refreshTokenCheck, 60000); // check every minute
         });
 
         
@@ -300,6 +301,11 @@ var app = {
         blink1.fadeToRGB(500, 255, 0, 0, function() { blink1.fadeToRGB(500, 0, 255, 0, function() { blink1.fadeToRGB(500, 9, 0, 255, function() { blink1.fadeToRGB(100, 0, 0, 0);});})})
 
         this.loop();
+    },
+
+    log: function(msg) {
+        var now = new Date();
+        console.log(now.toDateString() + " " + now.getUTCHours() + ":" + now.getUTCMinutes() + ":" + now.getUTCSeconds() + " --> " + msg);
     },
 }
 
