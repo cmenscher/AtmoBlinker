@@ -1,6 +1,8 @@
-This application will get recent measurements from your NetAtmo and light up a ThingM blink(1) (http://thingm.com/products/blink-1.html) as an ambient display.
+![AtmoBlinker in action](/path/to/img.jpg)
 
-You'll also need an API key from NetAtmo, so go to http://dev.netatmo.com to get started.  Once you have a key you'll need to update the config variables in the config object.  After that simply enter this into the commandline:
+This application will get recent measurements from your Netatmo and light up a ThingM blink(1) (http://thingm.com/products/blink-1.html) as an ambient display.
+
+You'll also need an API key from Netatmo, so go to http://dev.netatmo.com to get started.  Once you have a key you'll need to update the config variables in the config object.  After that simply enter this into the commandline:
 
 ```javascript
 node blinky.js
