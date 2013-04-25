@@ -1,4 +1,4 @@
-![AtmoBlinker in action](/path/to/img.jpg)
+![AtmoBlinker in action](https://raw.github.com/cmenscher/AtmoBlinker/master/atmoblinker.png)
 
 This application will get recent measurements from your Netatmo and light up a ThingM blink(1) (http://thingm.com/products/blink-1.html) as an ambient display.
 
