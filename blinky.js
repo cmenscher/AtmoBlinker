@@ -29,12 +29,8 @@ var Netatmo = require('./netatmo');
 var netatmo;
 
 var app = {
-    tokenUpdated: 0,
     initialRun: true,
     loopInterval: 10000, // 10 sec
-
-    tokenCheckInterval: 60000, //check every minute
-    refreshTokenTimer: {},
 
     setRGB: function() {
         var val = netatmo.lastValue;
@@ -54,7 +50,17 @@ var app = {
             var callback = function() {};
         }
 
-        netatmo.getMeasurement(function(val) {
+        netatmo.getMeasurement({ type: 'Noise', date_end: 'last' }, function(err, response) {
+            var val;
+
+            if (err) { utils.log("\n"); util.error(err); return utils.log("\n"); }
+
+            if (!!response.error) {
+              utils.log("ERROR! " + response.error.message + " (" + response.error.code + ")");
+              return;
+            }
+            val = response.body[0].value[0][0];
+
             if(netatmo.lastValue != val) {
                 utils.log("Value has changed! (lastValue: " + netatmo.lastValue + ", value=" + val + ") Updating LED...");
                 netatmo.lastValue = val;                    
@@ -77,40 +83,25 @@ var app = {
         setInterval(this.handleMeasurement, _this.loopInterval);
     },
 
-    refreshTokenCheck: function() {
-        utils.log("Checking to see if the access token needs to be refreshed...");
-
-        var now = new Date();
-        var now_millis = now.getTime() / 1000;
-
-        // Note: adding 2 minutes to the expires_in cutoff so we can prevent loop() from being called when the token has expired
-        if(netatmo.config.nextTokenRefresh > (this.tokenUpdated + netatmo.config.credentials.expires_in + 120000)) {
-            this.tokenUpdated = now; // update tokenUpdated to now so we can check all over again
-            this.refreshToken();
-        }
-    },
-
     start: function() {
         var app = this;
-        var now = new Date();
         
-        this.tokenUpdated = now.getTime() / 1000; // Unix epoch
-
         // Initialize the first blink(1) found and cycle through some colors to be funky
         blink1 = new Blink1.Blink1();
 
         // Initialize the netatmo
-        netatmo = new Netatmo.Netatmo(this.tokenUpdated);
+        netatmo = new Netatmo.Netatmo();
+//      netatmo.setConfig('$CLIENT_ID', '$CLIENT_SECRET', '$USERNAME', '$PASSWORD');
 
         // authorize
-        netatmo.getToken(function() {
+        netatmo.getToken(function(err) {
+            if (err) return console.log(err);
+
             blink1.fadeToRGB(200, 255, 0, 0, function() { blink1.fadeToRGB(200, 0, 255, 0, function() { blink1.fadeToRGB(200, 9, 0, 255, function() { blink1.fadeToRGB(100, 0, 0, 0);});})})
 
-            // check to see if we need to get a new token every minute
-            app.refreshTokenTimer = setInterval(app.refreshTokenCheck, app.tokenCheckInterval);
+            netatmo.getDevices(function(err, device_data) {
+                if (err) return console.log(err);
 
-            // now get the devices for this account and set the device_id
-            netatmo.getDevices(function(device_data) {
                 //assume we'll use the first device
                 netatmo.device_id = device_data.body.devices[0]._id;
                 utils.log("READY.........FIGHT!");
