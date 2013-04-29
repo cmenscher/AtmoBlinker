@@ -32,6 +32,14 @@ var app = {
     initialRun: true,
     loopInterval: 10000, // 10 sec
 
+
+    log: {
+        error   : function(msg, props) { console.log(msg); console.trace(props.exception); }
+        , warning : function(msg, props) { console.log(msg); if (props) console.log(props);  }
+        , notice  : function(msg, props) { console.log(msg); if (props) console.log(props);  }
+        , info    : function(msg, props) { console.log(msg); if (props) console.log(props);  }
+    },
+
     setRGB: function() {
         var val = netatmo.lastValue;
         if(val < 45) {
@@ -53,16 +61,16 @@ var app = {
         netatmo.getMeasurement({ type: 'Noise', date_end: 'last' }, function(err, response) {
             var val;
 
-            if (err) { utils.log("\n"); util.error(err); return utils.log("\n"); }
+            if (err) { _this.log("\n"); util.error(err); return _this.log("\n"); }
 
             if (!!response.error) {
-              utils.log("ERROR! " + response.error.message + " (" + response.error.code + ")");
+              _this.log("ERROR! " + response.error.message + " (" + response.error.code + ")");
               return;
             }
             val = response.body[0].value[0][0];
 
             if(netatmo.lastValue != val) {
-                utils.log("Value has changed! (lastValue: " + netatmo.lastValue + ", value=" + val + ") Updating LED...");
+                _this.log("Value has changed! (lastValue: " + netatmo.lastValue + ", value=" + val + ") Updating LED...");
                 netatmo.lastValue = val;                    
                 _this.setRGB();
             }
@@ -104,7 +112,7 @@ var app = {
 
                 //assume we'll use the first device
                 netatmo.device_id = device_data.body.devices[0]._id;
-                utils.log("READY.........FIGHT!");
+                app.log("READY.........FIGHT!");
                 app.loop();
             });
         });
