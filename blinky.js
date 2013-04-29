@@ -91,7 +91,7 @@ var app = {
 
         // Initialize the netatmo
         netatmo = new Netatmo.Netatmo();
-//      netatmo.setConfig('$CLIENT_ID', '$CLIENT_SECRET', '$USERNAME', '$PASSWORD');
+        //netatmo.setConfig('$CLIENT_ID', '$CLIENT_SECRET', '$USERNAME', '$PASSWORD');
 
         // authorize
         netatmo.getToken(function(err) {
