@@ -25,7 +25,7 @@ var utils = require("./utils");
 var Blink1 = require('node-blink1');
 var blink1;
 
-var Netatmo = require('./netatmo');
+var Netatmo = require('node-netatmo');
 var netatmo;
 
 var app = {
