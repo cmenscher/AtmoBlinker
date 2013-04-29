@@ -19,3 +19,5 @@ To start the daemon, use:
 ```javascript
 forever start atmo_daemon.js
 ```
+
+Many thanks to Marshall Rose (http://github.com/mrose17) for the help Node-ifying this!
